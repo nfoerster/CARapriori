@@ -6,12 +6,12 @@ http://facweb.cs.depaul.edu/mobasher/classes/ect584/Lectures/Liu-Ch2-4.pdf
 # How to use python CAR apriori?
 
 ## Import
-<pre><code>import carapriori as cp
+<pre><code class="prettyprint">import carapriori as cp
 </code></pre>
 
 ## Example
 
-<pre><code># Example dataframe of transactions
+<pre><code class="prettyprint"># Example dataframe of transactions
 df = pd.DataFrame({         'STUDENT':     ['STUDENT',  'STUDENT',  np.nan,     np.nan,      np.nan,      np.nan,      np.nan], 
                             'TEACH':       ['TEACH',    np.nan,    'TEACH',    np.nan,      np.nan,      np.nan,      np.nan],
                             'SCHOOL':      ['SCHOOL',   'SCHOOL',   'SCHOOL',   np.nan,      np.nan,      np.nan,      np.nan],
@@ -42,7 +42,7 @@ rules = cararpriori.run(ids, classes, 0.15, 0.66, 3)
 final = cp.postprocess_data(rules, inverse_dict)
 </code></pre>
 
-<pre><code>
+<pre><code class="prettyprint">
                   LHS        RHS  Support  Confidence
 0        [TEAM, GAME]      SPORT    0.286       1.000
 1             [TEACH]  EDUCATION    0.286       1.000
