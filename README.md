@@ -12,8 +12,9 @@ import carapriori as cp
 
 ## Example
 
-
 ```python
+import numpy as np
+
 # Example dataframe of transactions
 df = pd.DataFrame({         'STUDENT':     ['STUDENT',  'STUDENT',  np.nan,     np.nan,      np.nan,      np.nan,      np.nan], 
                             'TEACH':       ['TEACH',    np.nan,    'TEACH',    np.nan,      np.nan,      np.nan,      np.nan],
