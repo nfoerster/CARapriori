@@ -265,7 +265,7 @@ class CARapriori:
     Returns:
     [set] Returns the data mined rules
     """
-    def car_apriori(self, ids, target_ids, min_support=0.15, min_confidence=0.7, max_length=2):
+    def run(self, ids, target_ids, min_support=0.15, min_confidence=0.7, max_length=2):
         rules = set()
         
         #inital pass
@@ -294,13 +294,11 @@ class CARapriori:
 
 
         return rules
-    
-if __name__ == "__main__":
+
+import unittest
+class TestCARapriori(unittest.TestCase):
     import pandas as pd
-    import numpy as np
-    import time
-    import cProfile
-    transactions = pd.DataFrame({'STUDENT':     ['STUDENT',  'STUDENT',  np.nan,     np.nan,      np.nan,      np.nan,      np.nan], 
+    df = pd.DataFrame({         'STUDENT':     ['STUDENT',  'STUDENT',  np.nan,     np.nan,      np.nan,      np.nan,      np.nan], 
                                 'TEACH':       ['TEACH',    np.nan,    'TEACH',    np.nan,      np.nan,      np.nan,      np.nan],
                                 'SCHOOL':      ['SCHOOL',   'SCHOOL',   'SCHOOL',   np.nan,      np.nan,      np.nan,      np.nan],
                                 'CITY':        [np.nan,     np.nan,     'CITY',     np.nan,      np.nan,      np.nan,      'CITY'],
@@ -314,20 +312,86 @@ if __name__ == "__main__":
                                 'EDUCATION':   ['EDUCATION','EDUCATION','EDUCATION',np.nan,      np.nan,      np.nan,      np.nan],
                                 'SPORT':       [np.nan,     np.nan,     np.nan,     'SPORT',     'SPORT',     'SPORT',     'SPORT']})
 
-    
-    transactions, replacement_dict, inverse_dict = preprocess_data(transactions)
-    print(transactions)
+    def test_preprocess_data(self):
+        transactions, replacement_dict, inverse_dict = preprocess_data(self.df)
 
-    print(replacement_dict)
+        student_id = replacement_dict['STUDENT']
+        teach_id = replacement_dict['TEACH']
+        school_id = replacement_dict['SCHOOL']
+        city_id = replacement_dict['CITY']
+        game_id = replacement_dict['GAME']
+        baseball_id = replacement_dict['BASEBALL']
+        basketball_id = replacement_dict['BASKETBALL']
+        spectator_id = replacement_dict['SPECTATOR']
+        player_id = replacement_dict['PLAYER']
+        coach_id = replacement_dict['COACH']
+        team_id = replacement_dict['TEAM']
+        education_id = replacement_dict['EDUCATION']
+        sport_id = replacement_dict['SPORT']
+        
+        candidates = [
+            [student_id,teach_id,school_id,education_id],
+            [student_id,school_id,education_id],
+            [teach_id,school_id,city_id,game_id,education_id],
+            [baseball_id,basketball_id,sport_id],
+            [basketball_id,spectator_id,player_id,sport_id],
+            [game_id,baseball_id,coach_id,team_id,sport_id],
+            [city_id,game_id,basketball_id,team_id,sport_id],
+        ]
+        
+        for t in transactions:
+            found = False
+            for c in candidates:
+                cs = set(c)
+                diff = set(t).difference(cs)
+                if len(diff) == 0:
+                    found = True
+                    break
+            if not found:
+                self.fail('transaction list wrong')
+        
+        self.assertEqual('STUDENT',inverse_dict[student_id])
+        self.assertEqual('TEACH',inverse_dict[teach_id])
+        self.assertEqual('SCHOOL',inverse_dict[school_id])
+        self.assertEqual('CITY',inverse_dict[city_id])
+        self.assertEqual('GAME',inverse_dict[game_id])
+        self.assertEqual('BASEBALL',inverse_dict[baseball_id])
+        self.assertEqual('BASKETBALL',inverse_dict[basketball_id])
+        self.assertEqual('SPECTATOR',inverse_dict[spectator_id])
+        self.assertEqual('PLAYER',inverse_dict[player_id])
+        self.assertEqual('COACH',inverse_dict[coach_id])
+        self.assertEqual('TEAM',inverse_dict[team_id])
+        self.assertEqual('EDUCATION',inverse_dict[education_id])
+        self.assertEqual('SPORT',inverse_dict[sport_id])
 
-    started = int(round(time.time() * 1000))
+    def test_split_classes_id(self):
+        transactions, replacement_dict, inverse_dict = preprocess_data(self.df)
+        cararpriori = CARapriori(transactions)
+        ids, classes = split_classes_ids(replacement_dict, ['EDUCATION','SPORT'])
 
-    cararpriori = CARapriori(transactions)
-    ids, classes = split_classes_ids(replacement_dict, ['EDUCATION','SPORT'])
+        education_id = replacement_dict['EDUCATION']
+        sport_id = replacement_dict['SPORT']
 
-    rules = cararpriori.car_apriori(ids, classes, 0.15, 0.66, 3)
-    df = postprocess_data(rules, inverse_dict)
-    time_needed = (int(round(time.time() * 1000)) - started)
+        base = set([x for x in range(14)])
+        selection = set([education_id,sport_id])
 
-    print('CARapriori finished, time needed:{} ms'.format(time_needed))
-    print(df)
+        selection_from_base = base.difference(selection)
+
+        if len(selection_from_base.difference(ids)) != 0:
+                self.fail('missing elements in ids')
+                
+        if len(classes.difference(selection)) != 0:
+                self.fail('missing elements in classes')
+
+    def test_run(self):
+        transactions, replacement_dict, inverse_dict = preprocess_data(self.df)
+        cararpriori = CARapriori(transactions)
+        ids, classes = split_classes_ids(replacement_dict, ['EDUCATION','SPORT'])
+
+        rules = cararpriori.run(ids, classes, 0.15, 0.66, 3)
+        df = postprocess_data(rules, inverse_dict)
+        self.assertEqual(10,len(df))
+
+
+if __name__ == '__main__':
+    unittest.main()
