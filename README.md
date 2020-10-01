@@ -6,12 +6,15 @@ http://facweb.cs.depaul.edu/mobasher/classes/ect584/Lectures/Liu-Ch2-4.pdf
 # How to use python CAR apriori?
 
 ## Import
-<pre><code class="prettyprint">import carapriori as cp
-</code></pre>
+```python
+import carapriori as cp
+```
 
 ## Example
 
-<pre><code class="prettyprint"># Example dataframe of transactions
+
+```python
+# Example dataframe of transactions
 df = pd.DataFrame({         'STUDENT':     ['STUDENT',  'STUDENT',  np.nan,     np.nan,      np.nan,      np.nan,      np.nan], 
                             'TEACH':       ['TEACH',    np.nan,    'TEACH',    np.nan,      np.nan,      np.nan,      np.nan],
                             'SCHOOL':      ['SCHOOL',   'SCHOOL',   'SCHOOL',   np.nan,      np.nan,      np.nan,      np.nan],
@@ -40,9 +43,9 @@ rules = cararpriori.run(ids, classes, 0.15, 0.66, 3)
 
 # Post process the data to a readable dataframe
 final = cp.postprocess_data(rules, inverse_dict)
-</code></pre>
+```
 
-<pre><code class="prettyprint">
+```
                   LHS        RHS  Support  Confidence
 0        [TEAM, GAME]      SPORT    0.286       1.000
 1             [TEACH]  EDUCATION    0.286       1.000
@@ -55,6 +58,6 @@ final = cp.postprocess_data(rules, inverse_dict)
 8          [BASEBALL]      SPORT    0.286       1.000
 9   [STUDENT, SCHOOL]  EDUCATION    0.286       1.000
 10       [BASKETBALL]      SPORT    0.429       1.000
-</code></pre>
+```
 
 preprocess_data translates a dataframe to a set of transactions and a string/int dict/inverse_dict. With the transactions at hand you can create an CARapriori object. Next you can define the right hand labels by calling split_classes_ids. With the ids and classes the next step is calling the run function. Additionally you can define the minimum support, minimum confidence and the maximum rule length. After getting the rules calling the postprocess_data function to get a readable dataframe back.
